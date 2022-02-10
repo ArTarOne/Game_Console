@@ -249,5 +249,16 @@ protected:
     std::vector <BJ_Card * > m_Cards;
 };
 
+class BJ_GenericPlayer : public BJ_Hand {
+friend std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rPlayer);
+public:
+    BJ_GenericPlayer(const std::string & rName = "");
+    virtual ~BJ_GenericPlayer();
+    virtual bool IsHitt() const = 0; // показывает, хочет ли игрок продолжать брать карты
+    bool IsBusted() const; // Возвращает значение, если у игрока "перебор", больше 21
+    void Bust() const; // объявляет, что у игрока перебор
+protected:
+    std::string m_NamePlayer;
+};
 
 #endif //EXC_FROM_BOOK_CLASS

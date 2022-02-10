@@ -460,3 +460,17 @@ int BJ_Hand::GetTotal() const {
     return total;
 }
 // end class BJ_Hand // */
+
+// end class BJ_GenericPlayer
+BJ_GenericPlayer::BJ_GenericPlayer(const std::string & rName):
+    m_NamePlayer(rName) { // zero body class constructor
+}
+BJ_GenericPlayer::~BJ_GenericPlayer() {// zero body ~destructor
+}
+inline bool BJ_GenericPlayer::IsBusted() const {
+    return (GetTotal() > 21);
+}
+inline void BJ_GenericPlayer::Bust() const {
+    std::cout << m_NamePlayer << " busts...\n";
+}
+// end class BJ_GenericPlayer // */
