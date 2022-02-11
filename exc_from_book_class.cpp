@@ -451,7 +451,7 @@ int BJ_Hand::GetTotal() const {
     // отределяем туз в руке
     bool inHandAce = false;
     for(c_iter = m_Cards.begin(); c_iter != m_Cards.end(); c_iter++) {
-        if((*c_iter)->GetValue() == BJ_Card::ACE)
+        if((*c_iter)->GetValue() == BJ_Card::R_ACE)
             inHandAce = true;
     }
     // если в руке туз, а сумма маленькая, туз даёт 11 очклв
@@ -515,11 +515,51 @@ void BJ_House::FlipFirstCard() {
     else
         std::cout << "Sorry, no card to flip!\n";
 }
-/* class BJ_House : public BJ_GenericPlayer {
-public:
-    BJ_House(const std::string & rNameHouse);
-    virtual ~BJ_House();
-    virtual bool IsHitt() const; // показывает, хочет ли игрок продолжать брать карты
-    void FlipFirstCaard(); // переворачивает первую карту
-};
 // end class BJ_House // */
+
+// class BJ_Deck
+BJ_Deck::BJ_Deck() {
+    const int MAX_CARD = 52;
+    m_Cards.reserve(MAX_CARD);
+    Populate(); // инициализировать колоду карт
+}
+BJ_Deck::~BJ_Deck() { // zero body ~destructor
+}
+void BJ_Deck::Populate() {
+    Clear(); // это зачем ?
+    // создаём стандартуню колоду карт
+    for(int s = BJ_Card::S_CLUBS; s <= BJ_Card::S_SPADERS; s++)
+        for(int r = BJ_Card::R_ACE; r <= BJ_Card::R_KING; r++)
+            AddCard(new BJ_Card(static_cast <BJ_Card::rank>(r),
+                                static_cast <BJ_Card::suit>(s) ) );
+}
+void BJ_Deck::Shuffle() {
+    std::random_shuffle(m_Cards.begin(), m_Cards.end() );
+}
+void BJ_Deck::Deal(BJ_Hand &rHand) {
+    if(!m_Cards.empty())
+        rHand.AddCard(m_Cards.back());
+    else
+        std::cout << "Out of cards. Unable to deal.";
+}
+void BJ_Deck::AdditionalMore(BJ_GenericPlayer &rGPlayer) {
+    std::cout << std::endl;
+// продолжаем раздавать карты до тех пор, пока у игрока не случится перебор
+// или пока не захочет взять еще одлну
+    while( (!(rGPlayer.IsBusted())) and rGPlayer.IsHitt() ) {
+        Deal(rGPlayer);
+        std::cout << rGPlayer << std::endl;
+        if(rGPlayer.IsBusted())
+            rGPlayer.Bust();
+    }
+}
+/* class BJ_Deck : public BJ_Hand {
+public:
+    BJ_Deck();
+    virtual ~BJ_Deck();
+    void Populate(); // создание колоды карт из 52 карт
+    void Shuffle(); // Тусование колоды карт
+    void Deal(BJ_Hand & rHand); // раздаёт одну карту в руку
+    void AddCardMore(BJ_GenericPlayer & rGPlayer); // даёт дополнительные карты игроку
+};
+// end class BJ_Deck // */

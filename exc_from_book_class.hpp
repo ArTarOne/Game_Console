@@ -222,12 +222,12 @@ public:
 
 class BJ_Card {
 public:
-    enum rank {ACE = 1, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN,
-               JACK, QUEEN, KING};
-    enum suit {CLUBS, DIAMOND, HEARTS, SPADERS};
+    enum rank {R_ACE = 1, R_TWO, R_THREE, R_FOUR, R_FIVE, R_SIX, R_SEVEN,
+               R_EIGHT, R_NINE, R_TEN, R_JACK, R_QUEEN, R_KING};
+    enum suit {S_CLUBS, S_DIAMOND, S_HEARTS, S_SPADERS};
     // прегружаем оператор <<, что бы можно было отображать объект в стандартный поток вывода
     friend std::ostream & operator << (std::ostream & out, const BJ_Card & rCard);
-    BJ_Card(rank r = ACE, suit s = SPADERS, bool iFace = true);
+    BJ_Card(rank r = R_ACE, suit s = S_SPADERS, bool iFace = true);
     int GetValue() const; // возвращает значение карты от 1 до 11
     void Flip(); // переворачивает карту лицом вниз или вверх
 private:
@@ -265,7 +265,28 @@ class BJ_Player : public BJ_GenericPlayer {
 public:
     BJ_Player(const std::string & rName = "");
     virtual ~BJ_Player();
-    virtual bool IsHitt() const; // показывае,
+    virtual bool IsHitt() const; // показывае, хочет ли игрок продолжать брать карты
+    void Win() const; // объявляет, что игрок победил
+    void Lose() const; // объявляет, что игрок проиграл
+    void Push() const; // объявляет ничью
+};
+
+class BJ_House : public BJ_GenericPlayer {
+public:
+    BJ_House(const std::string & rNameHouse);
+    virtual ~BJ_House();
+    virtual bool IsHitt() const; // показывает, хочет ли игрок продолжать брать карты
+    void FlipFirstCard(); // переворачивает первую карту
+};
+
+class BJ_Deck : public BJ_Hand {
+public:
+    BJ_Deck();
+    virtual ~BJ_Deck();
+    void Populate(); // создание колоды карт из 52 карт
+    void Shuffle(); // Тусование колоды карт
+    void Deal(BJ_Hand & rHand); // раздаёт одну карту в руку
+    void AdditionalMore(BJ_GenericPlayer & rGPlayer); // даёт дополнительные карты игроку
 };
 
 #endif //EXC_FROM_BOOK_CLASS
