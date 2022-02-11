@@ -712,3 +712,15 @@ int G10_abstractCreater() { // пример абстрактных (базовы
     pMob = nullptr;
     return 0;
 }
+
+int G10_BlackJack() { // игра в blackjack
+    const int MAX_PLR = 7;
+    const int MIN_PLR = 1;
+    std::cout << "\t\tWelcom to BlackJack!\n\n";
+    int numPlayers = f6_askNumber("How many players? (1-7):", MAX_PLR, MIN_PLR); // моя валидация ввода = )
+    /*while(numPlayers < 1 or numPlayers > 7) {
+        std::cout << "How many players? (1-7):";
+        std::cin >> numPlayers;
+    } // */
+    return 0;
+}

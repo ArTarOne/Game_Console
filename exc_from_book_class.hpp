@@ -225,7 +225,7 @@ public:
     enum rank {R_ACE = 1, R_TWO, R_THREE, R_FOUR, R_FIVE, R_SIX, R_SEVEN,
                R_EIGHT, R_NINE, R_TEN, R_JACK, R_QUEEN, R_KING};
     enum suit {S_CLUBS, S_DIAMOND, S_HEARTS, S_SPADERS};
-    // прегружаем оператор <<, что бы можно было отображать объект в стандартный поток вывода
+// прегружаем оператор <<, что бы можно было отображать объект в стандартный поток вывода
     friend std::ostream & operator << (std::ostream & out, const BJ_Card & rCard);
     BJ_Card(rank r = R_ACE, suit s = S_SPADERS, bool iFace = true);
     int GetValue() const; // возвращает значение карты от 1 до 11
@@ -250,6 +250,7 @@ protected:
 };
 
 class BJ_GenericPlayer : public BJ_Hand {
+// печать ввод-вывод
 friend std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rPlayer);
 public:
     BJ_GenericPlayer(const std::string & rName = "");
@@ -273,7 +274,7 @@ public:
 
 class BJ_House : public BJ_GenericPlayer {
 public:
-    BJ_House(const std::string & rNameHouse);
+    BJ_House(const std::string & rNameHouse = "House");
     virtual ~BJ_House();
     virtual bool IsHitt() const; // показывает, хочет ли игрок продолжать брать карты
     void FlipFirstCard(); // переворачивает первую карту
@@ -289,4 +290,18 @@ public:
     void AdditionalMore(BJ_GenericPlayer & rGPlayer); // даёт дополнительные карты игроку
 };
 
+class BJ_Game {
+    BJ_Deck m_Deck;
+    BJ_House m_House;
+    std::vector <BJ_Player> m_Players;
+public:
+    BJ_Game(const std::vector <std::string> & rNameVec);
+    ~BJ_Game();
+    void StartPlay(); // запустить игру в BlackJack
+};
+
+// перегруженные операторы вывода BJ
+std::ostream & operator << (std::ostream & out, const BJ_Card & rCard);
+std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rGPlr);
+// проект blackJack ---------------10 глава ---- end ---------------------------
 #endif //EXC_FROM_BOOK_CLASS

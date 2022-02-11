@@ -390,7 +390,38 @@ void f10_Orc::Greet() const {
 // end class f10_Orc // */
 // ++++++++++++++++++++++++++++++++++++++++
 // проект blackJack ---------------10 глава ------------------------------------
-// перешруженная функция вывода в поток std::cout
+// перегруженная функция вывода в поток std::cout
+
+std::ostream & operator << (std::ostream & out, const BJ_Card & rCard) {
+    //out << "BJ_Card out <<";
+    const std::string RANKS[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8",
+                                 "9", "10", "J", "Q", "K"};
+    // enum suit {S_CLUBS, S_DIAMOND, S_HEARTS, S_SPADERS};
+    const std::string SUITS[] = {"c", "d", "h", "s"};
+    rCard.m_IsFaceUp ? (out << RANKS[rCard.m_Rank] << RANKS[rCard.m_Suit]) : (out << "XX");
+
+    /*if(rCard.m_IsFaceUp )
+        out << RANKS[rCard.m_Rank] << RANKS[rCard.m_Suit];
+    else
+        out << "XX"; //*/
+    return out;
+}
+std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rGPlr) {
+    //out << "BJ_GenericPlayer out <<";
+    out << rGPlr.m_NamePlayer << ":\t";
+    std::vector <BJ_Card*> ::const_iterator pCard; // указатель на указатель = )
+
+    if(!rGPlr.m_Cards.empty()) {
+        for(pCard = rGPlr.m_Cards.begin(); pCard != rGPlr.m_Cards.end(); pCard++)
+            out << *(*pCard) << "\t";
+
+        if(rGPlr.GetTotal() != 0)
+            out << "(" << rGPlr.GetTotal() << ")";
+    }
+    else
+        out << "<empty>";
+    return out;
+}
 
 // class BJ_Card
 BJ_Card::BJ_Card(rank r, suit s, bool iFace) :
@@ -468,7 +499,6 @@ BJ_GenericPlayer::BJ_GenericPlayer(const std::string & rName):
 BJ_GenericPlayer::~BJ_GenericPlayer() {// zero body ~destructor
 }
 inline bool BJ_GenericPlayer::IsBusted() const {
-    //const int PLAYER_HITT = 16;
     return (GetTotal() > 21);
 }
 inline void BJ_GenericPlayer::Bust() const {
@@ -548,18 +578,73 @@ void BJ_Deck::AdditionalMore(BJ_GenericPlayer &rGPlayer) {
 // или пока не захочет взять еще одлну
     while( (!(rGPlayer.IsBusted())) and rGPlayer.IsHitt() ) {
         Deal(rGPlayer);
-        std::cout << rGPlayer << std::endl;
+        //std::cout << rGPlayer << std::endl; ! доделать вывод!
         if(rGPlayer.IsBusted())
             rGPlayer.Bust();
     }
 }
-/* class BJ_Deck : public BJ_Hand {
-public:
-    BJ_Deck();
-    virtual ~BJ_Deck();
-    void Populate(); // создание колоды карт из 52 карт
-    void Shuffle(); // Тусование колоды карт
-    void Deal(BJ_Hand & rHand); // раздаёт одну карту в руку
-    void AddCardMore(BJ_GenericPlayer & rGPlayer); // даёт дополнительные карты игроку
-};
 // end class BJ_Deck // */
+
+// class BJ_Game
+BJ_Game::BJ_Game(const std::vector <std::string> & rNameVec) {
+    // создать вектор игроков из вектора с именами...
+    std::vector <std::string> ::const_iterator pName;
+    for(pName = rNameVec.begin(); pName != rNameVec.end(); pName++)
+        m_Players.push_back(BJ_Player(*pName));
+    // посев генератора случайных чисел
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    m_Deck.Populate();
+    m_Deck.Shuffle();
+}
+BJ_Game::~BJ_Game(){ // zero body ~destructor
+}
+void BJ_Game::StartPlay() {
+    const int MAX_CARD = 2;
+    std::vector <BJ_Player> ::iterator pPlayer; // раздать каждому по 2 карты
+    for(int card = 0; card < MAX_CARD; card++) {
+        for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++)
+            m_Deck.Deal(*pPlayer);
+
+        m_Deck.Deal(m_House);
+    }
+    m_House.FlipFirstCard(); // спрятать первую карту диллера
+
+    //открыть руки всех игроков
+    /* for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++)
+        std::cout << *pPlayer << std::endl;
+    // */
+    for(auto pPlrs = begin(m_Players); pPlrs != end(m_Players); pPlrs++)
+        std::cout << *pPlrs << std::endl;
+
+    std::cout << m_House << std::endl; // открываем диллера
+
+    // создать игрокам дополнитлеьные карты
+    for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++)
+        m_Deck.AdditionalMore(*pPlayer);
+
+    m_House.FlipFirstCard(); // показать первую карту диллера
+    std::cout << std::endl << m_House;
+    m_Deck.AdditionalMore(m_House); // раздать диллеру дополнительную карту
+
+    if(m_House.IsBusted()) { // проверка кто выйграл/проиграл
+        // все, кто остался в игре - побеждают
+        for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++)
+            if(!(pPlayer->IsBusted() ) )
+                pPlayer->Win();
+    }
+    else // сравнивает суммы очков игроков (кто остался) с очками диллера
+        for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++) {
+            if(pPlayer->GetTotal() > m_House.GetTotal())
+               pPlayer->Win();
+            else if(pPlayer->GetTotal() < m_House.GetTotal())
+                pPlayer->Lose();
+            else
+                pPlayer->Push();
+        }
+
+    // очищает руки всех игроков
+    for(pPlayer = m_Players.begin(); pPlayer != m_Players.end(); pPlayer++)
+        pPlayer->Clear();
+    m_House.Clear();
+}
+// end class BJ_Game // */

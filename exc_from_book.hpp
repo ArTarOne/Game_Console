@@ -127,5 +127,5 @@ int G10_abstractCreater(); // пример абстрактных (базовы�
 ///
 /// \return
 ///
-int G10_BlackJack();
+int G10_BlackJack(); // игра в blackjack
 #endif //EXC_FROM_BOOK_HPP
