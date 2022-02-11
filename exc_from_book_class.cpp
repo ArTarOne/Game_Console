@@ -468,9 +468,58 @@ BJ_GenericPlayer::BJ_GenericPlayer(const std::string & rName):
 BJ_GenericPlayer::~BJ_GenericPlayer() {// zero body ~destructor
 }
 inline bool BJ_GenericPlayer::IsBusted() const {
+    //const int PLAYER_HITT = 16;
     return (GetTotal() > 21);
 }
 inline void BJ_GenericPlayer::Bust() const {
     std::cout << m_NamePlayer << " busts...\n";
 }
 // end class BJ_GenericPlayer // */
+
+// end class BJ_Player
+BJ_Player::BJ_Player(const std::string & rName):
+    BJ_GenericPlayer(rName) { // zero body class constructor
+}
+BJ_Player::~BJ_Player() { // zero body ~destructor
+}
+bool BJ_Player::IsHitt() const{
+    std::cout << m_NamePlayer <<", do you want a hit? (\'Y\'/\'y\' or any key): ";
+    char answer;
+    std::cin >> answer;
+    return (answer == 'y' or answer == 'Y');
+}
+inline void BJ_Player::Win() const {
+    std::cout << m_NamePlayer << " wins.\n";
+}
+inline void BJ_Player::Lose() const {
+    std::cout << m_NamePlayer << " loses.\n";
+}
+inline void BJ_Player::Push() const {
+    std::cout << m_NamePlayer << " pushes.\n";
+}
+// end class BJ_Player // */
+
+// class BJ_House
+BJ_House::BJ_House(const std::string & rNameHouse):
+    BJ_GenericPlayer(rNameHouse) { // zero body class constructor
+}
+BJ_House::~BJ_House() { // zero body ~destructor
+}
+inline bool BJ_House::IsHitt() const {
+    //const int HOUSE_HITT = 16;
+    return (GetTotal() <= 16);
+}
+void BJ_House::FlipFirstCard() {
+    if(!m_Cards.empty() )
+        m_Cards[0]->Flip();
+    else
+        std::cout << "Sorry, no card to flip!\n";
+}
+/* class BJ_House : public BJ_GenericPlayer {
+public:
+    BJ_House(const std::string & rNameHouse);
+    virtual ~BJ_House();
+    virtual bool IsHitt() const; // показывает, хочет ли игрок продолжать брать карты
+    void FlipFirstCaard(); // переворачивает первую карту
+};
+// end class BJ_House // */

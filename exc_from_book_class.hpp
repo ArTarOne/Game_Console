@@ -261,4 +261,11 @@ protected:
     std::string m_NamePlayer;
 };
 
+class BJ_Player : public BJ_GenericPlayer {
+public:
+    BJ_Player(const std::string & rName = "");
+    virtual ~BJ_Player();
+    virtual bool IsHitt() const; // показывае,
+};
+
 #endif //EXC_FROM_BOOK_CLASS
