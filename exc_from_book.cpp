@@ -717,10 +717,31 @@ int G10_BlackJack() { // игра в blackjack
     const int MAX_PLR = 7;
     const int MIN_PLR = 1;
     std::cout << "\t\tWelcom to BlackJack!\n\n";
-    int numPlayers = f6_askNumber("How many players? (1-7):", MAX_PLR, MIN_PLR); // моя валидация ввода = )
+    //int numPlayers = f6_askNumber("How many players? (1-7):", MAX_PLR, MIN_PLR); // моя валидация ввода = )
+    std::cout << "4 players\n";
+    int numPlayers = 4; // отладочка !!!
     /*while(numPlayers < 1 or numPlayers > 7) {
         std::cout << "How many players? (1-7):";
         std::cin >> numPlayers;
     } // */
+    std::vector <std::string> names;
+    std::string tmpName[] = {"P1" , "P2", "P3", "P4"};
+    for(int i = 0; i < numPlayers; i++) {
+        //std::cout << "Enter player name: ";
+        //std::cin >> tmpName;
+        //names.push_back(tmpName);
+        names.push_back(tmpName[i]);
+    }
+    std::cout << std::endl;
+    // игровой цикл
+    BJ_Game game(names); // создаём игроков и поле
+    char againGame = 'y';
+    //while ((againGame != 'n') or (againGame != 'N')) {
+    while ( !((againGame == 'n') or (againGame == 'N')) ) {
+        //game.StartPlay();
+        //std::cout << "\n\n\tDo you want to play again? (Y/N): ";
+        //std::cin >> againGame;
+        againGame = f6_askYesNo("\n\n\tDo you want to play again? "); // оптимизация = )
+    }
     return 0;
 }

@@ -394,16 +394,13 @@ void f10_Orc::Greet() const {
 
 std::ostream & operator << (std::ostream & out, const BJ_Card & rCard) {
     //out << "BJ_Card out <<";
-    const std::string RANKS[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8",
-                                 "9", "10", "J", "Q", "K"};
+    const std::string RANKS[] = {"00", "01", "02", "03", "04", "05", "06", "07", "08",
+                                 "09", "10", "JJ", "QQ", "KK"};
     // enum suit {S_CLUBS, S_DIAMOND, S_HEARTS, S_SPADERS};
-    const std::string SUITS[] = {"c", "d", "h", "s"};
-    rCard.m_IsFaceUp ? (out << RANKS[rCard.m_Rank] << RANKS[rCard.m_Suit]) : (out << "XX");
+    const std::string SUITS[] = {"_C", "_D", "_H", "_S"};
+    // поправил, работает = )
+    rCard.m_IsFaceUp ? (out << RANKS[rCard.m_Rank] << SUITS[rCard.m_Suit]) : (out << "XX_X");
 
-    /*if(rCard.m_IsFaceUp )
-        out << RANKS[rCard.m_Rank] << RANKS[rCard.m_Suit];
-    else
-        out << "XX"; //*/
     return out;
 }
 std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rGPlr) {
@@ -423,6 +420,7 @@ std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rGPlr) 
     return out;
 }
 
+/************************** class BJ_Card *************************************/
 // class BJ_Card
 BJ_Card::BJ_Card(rank r, suit s, bool iFace) :
     m_Rank(r), m_Suit(s), m_IsFaceUp(iFace) { // zero body class constructor
@@ -435,17 +433,18 @@ int BJ_Card::GetValue() const {
         // значение - число указанное на карте
         value = m_Rank;
         // значение равно 10 для открытых карт
-        //! проверить работоспособность этой конструкции
-        (value > C_TEN) ? (value = C_TEN) : value;
+        if(value > C_TEN)
+            value = C_TEN;
     }
     return  value;
     //return  (value > C_TEN) ? C_TEN : value;;
 }
 inline void BJ_Card::Flip() {
-    m_IsFaceUp = !m_IsFaceUp;
+    m_IsFaceUp = !(m_IsFaceUp); // укажем явно
 }
 // end class BJ_Card
 
+/************************** class BJ_Hand *************************************/
 // class BJ_Hand
 BJ_Hand::BJ_Hand(int reserv) {
     m_Cards.reserve(reserv);
@@ -454,31 +453,37 @@ BJ_Hand::~BJ_Hand() {
     Clear();
 }
 void BJ_Hand::Clear() {
+    std::cout << "\n\t |Clear()|\n"; // отладка
     // проходим по вектору через итератор, освобождаем память
     std::vector <BJ_Card * >::iterator iter;
     for(iter = m_Cards.begin(); iter != m_Cards.end(); iter++) {
+        //std::cout << "value: " << (*iter)->GetValue() << std::endl; // отладка
         delete *iter; // удаляется объект BJ_Card
         *iter = nullptr;
     }
+    //std::cout << std::endl; // отладка
     // очищаем вектор указателей
     m_Cards.clear();
 }
-inline void BJ_Hand::AddCard(BJ_Card *pCard) {
+void BJ_Hand::AddCard(BJ_Card *pCard) {
+//inline void BJ_Hand::AddCard(BJ_Card *pCard) {
     m_Cards.push_back(pCard);
 }
 int BJ_Hand::GetTotal() const {
-    int MAX_ONE_VALUE = 11; // очков в одной карте
     // если карт в руке нет
     if(m_Cards.empty())
         return 0;
     // Если первая карта имеет значение 0, то она лежит рубашкой вверх, вернуть 0
     if(m_Cards[0]->GetValue() == 0)
         return 0;
+
+    int MAX_ONE_VALUE = 11; // очков в одной карте
     // находим сумму очков всех карт, Туз = 1
     int total = 0;
-    std::vector <BJ_Card *>::const_iterator c_iter;
+    std::vector <BJ_Card *> :: const_iterator c_iter;
+
     for(c_iter = m_Cards.begin(); c_iter != m_Cards.end(); c_iter++)
-            total += (*c_iter)->GetValue();
+        total += (*c_iter)->GetValue();
     // отределяем туз в руке
     bool inHandAce = false;
     for(c_iter = m_Cards.begin(); c_iter != m_Cards.end(); c_iter++) {
@@ -488,10 +493,12 @@ int BJ_Hand::GetTotal() const {
     // если в руке туз, а сумма маленькая, туз даёт 11 очклв
     if(inHandAce and (total <= MAX_ONE_VALUE))
         total += (MAX_ONE_VALUE - 1); // туз = 1 очку +10 = 11 очков
+
     return total;
 }
 // end class BJ_Hand // */
 
+/********************* class BJ_BJ_GenericPlayer ******************************/
 // end class BJ_GenericPlayer
 BJ_GenericPlayer::BJ_GenericPlayer(const std::string & rName):
     m_NamePlayer(rName) { // zero body class constructor
@@ -499,13 +506,15 @@ BJ_GenericPlayer::BJ_GenericPlayer(const std::string & rName):
 BJ_GenericPlayer::~BJ_GenericPlayer() {// zero body ~destructor
 }
 inline bool BJ_GenericPlayer::IsBusted() const {
-    return (GetTotal() > 21);
+    //return (GetTotal() > 21);
+    return (GetTotal() >= 21); // 21 включительно ?
 }
 inline void BJ_GenericPlayer::Bust() const {
     std::cout << m_NamePlayer << " busts...\n";
 }
 // end class BJ_GenericPlayer // */
 
+/*************************** class BJ_Player **********************************/
 // end class BJ_Player
 BJ_Player::BJ_Player(const std::string & rName):
     BJ_GenericPlayer(rName) { // zero body class constructor
@@ -513,22 +522,23 @@ BJ_Player::BJ_Player(const std::string & rName):
 BJ_Player::~BJ_Player() { // zero body ~destructor
 }
 bool BJ_Player::IsHitt() const{
-    std::cout << m_NamePlayer <<", do you want a hit? (\'Y\'/\'y\' or any key): ";
+    std::cout << m_NamePlayer <<", do you want a hit else? (\'Y\'/\'y\' or any key): ";
     char answer;
     std::cin >> answer;
     return (answer == 'y' or answer == 'Y');
 }
 inline void BJ_Player::Win() const {
-    std::cout << m_NamePlayer << " wins.\n";
+    std::cout << m_NamePlayer << " wins!.\n";
 }
 inline void BJ_Player::Lose() const {
     std::cout << m_NamePlayer << " loses.\n";
 }
 inline void BJ_Player::Push() const {
-    std::cout << m_NamePlayer << " pushes.\n";
+    std::cout << m_NamePlayer << " pushes (draws).\n";
 }
 // end class BJ_Player // */
 
+/*************************** class BJ_House ***********************************/
 // class BJ_House
 BJ_House::BJ_House(const std::string & rNameHouse):
     BJ_GenericPlayer(rNameHouse) { // zero body class constructor
@@ -547,6 +557,7 @@ void BJ_House::FlipFirstCard() {
 }
 // end class BJ_House // */
 
+/**************************** class BJ_Deck ***********************************/
 // class BJ_Deck
 BJ_Deck::BJ_Deck() {
     const int MAX_CARD = 52;
@@ -564,11 +575,22 @@ void BJ_Deck::Populate() {
                                 static_cast <BJ_Card::suit>(s) ) );
 }
 void BJ_Deck::Shuffle() {
+    /* std::cout << "Koloda: \n";
+    for(auto card : m_Cards) {
+        //std::cout << "value: " << card->GetValue() << "\n";
+        std::cout << *card << "\n";
+    } // вывод колоды карт */
     std::random_shuffle(m_Cards.begin(), m_Cards.end() );
+    /* std::cout << "Shaffle: \n";
+    for(auto iter : m_Cards) {
+        std::cout << "value: " << iter->GetValue() << "\n";
+    } // */
 }
 void BJ_Deck::Deal(BJ_Hand &rHand) {
-    if(!m_Cards.empty())
+    if(!m_Cards.empty()) {
         rHand.AddCard(m_Cards.back());
+        m_Cards.pop_back(); // вытащить карту !!! Эту строчку я пропустил...
+    }
     else
         std::cout << "Out of cards. Unable to deal.";
 }
@@ -585,6 +607,7 @@ void BJ_Deck::AdditionalMore(BJ_GenericPlayer &rGPlayer) {
 }
 // end class BJ_Deck // */
 
+/**************************** class BJ_Game ***********************************/
 // class BJ_Game
 BJ_Game::BJ_Game(const std::vector <std::string> & rNameVec) {
     // создать вектор игроков из вектора с именами...
