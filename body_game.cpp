@@ -612,3 +612,80 @@ int my9_lobby_mode() {  // игра с лобби и игроками дораб
 // -------------------------------------------------------------------------------
 // 10 глава книги. Задачки -------------------------------------------------------
 // -------------------------------------------------------------------------------
+
+int my10_finalBoss() { // дополнит программу boss 2.0, наследовать Фмнального боса.
+    std::cout << "\tCreate an myEnemy with protected m_Dmg.\n";
+    myEnemyProtect enemyPrtc(80);
+    std::cout << "\tmyEnemy attack: \n";
+    enemyPrtc.Attack();
+    std::cout << "\n\n\tCreate a myBoss\n";;
+    myBoss boss;
+    std::cout << "\tmyBoss attack and special attack: \n";
+    boss.Attack();
+    boss.SpecialAttack();
+    std::cout << "\n\n\tCreate a myFinalBoss\n";
+    myFinalBoss superBoss; // наследник myBosss
+    std::cout << "\tmyBoss attack, special attack, altra attack: \n";
+    superBoss.Attack();
+    superBoss.SpecialAttack();
+    superBoss.UltraAttack(); // */
+    return 0;
+}
+
+int my10_abstractOrcBoss() { // дополнит программу Abstract Creater, создать class Orc Boss.
+    std::cout << "\tCreate myOrc from myCreature class by poiner.\n";
+    myCreature *pOrc = new myOrc;
+    pOrc->Greet();
+    pOrc->ShowHealth();
+    delete pOrc;
+    pOrc = nullptr;
+
+    std::cout << "\tCreate myOrcBoss from myCreature class by poiner.\n";
+    myCreature *pOrcBoss = new myOrcBoss;
+
+    pOrcBoss->Greet();
+    pOrcBoss->ShowHealth();
+    delete pOrcBoss;
+    pOrcBoss = nullptr;
+    return 0;
+}
+
+
+int my10_BlackBlackJack() { // доделать создание новой колоды, если карт мало...
+    //const int MAX_PLR = 7;
+    //const int MIN_PLR = 1;
+    std::cout << "\t\tWelcom !!!\n\n";
+    std::cout << "\t\tWelcom to myBlackBlackJack!\n\n";
+    //int numPlayers = f6_askNumber("How many players? (1-7):", MAX_PLR, MIN_PLR); // моя валидация ввода = )
+
+    std::vector <std::string> namesPlayers;
+    //std::string tmpName;
+    std::string tmpName[] = {"P1" , "P2", "P3", "P4", "p5", "p6"}; // оладочка
+    //std::string tmpName[] = {"P1" , "P2"}; // 4 игрокаы
+    int numPlayers = 0;
+    for(auto c : tmpName) {
+        std::cout << c << std::endl;
+        numPlayers += 1;
+    }
+
+    std::cout << numPlayers << " players\n";
+    for(int i = 0; i < numPlayers; i++) {
+        //std::cout << "Enter player name: ";
+        //std::cin >> tmpName;
+        //names.push_back(tmpName);
+        namesPlayers.push_back(tmpName[i]);
+    }
+    std::cout << std::endl;
+    // игровой цикл
+    myGameBJ game(namesPlayers); // создаём игроков и поле
+    char againGame = 'y';
+    //while ((againGame != 'n') or (againGame != 'N')) {
+    while ( !((againGame == 'n') or (againGame == 'N')) ) {
+        game.StartPlay();
+        againGame = f6_askYesNo("\n\n\tDo you want to play again? "); // оптимизация = )
+    }
+
+    std::cout << "\t\tOkay you close the game myBlackBlackJack!\n";
+    std::cout << "\t\tBye-bye!\n";
+    return 0;
+}

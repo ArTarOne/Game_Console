@@ -68,7 +68,10 @@ int main() {
     //G10_virtual_boss();
     //G10_polymorphicBadGay();
     //G10_abstractCreater();
-    G10_BlackJack();
+    //G10_BlackJack();
+    //my10_finalBoss();
+    //my10_abstractOrcBoss();
+    my10_BlackBlackJack();
 
     /* генератор символов = )
     std::srand(static_cast <unsigned int> (std::time(0) ));

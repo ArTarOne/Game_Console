@@ -48,16 +48,64 @@ public:
 
 // 10 глава книги, мои классы!!! ================================================
 
+class myEnemyProtect {
+public:
+    myEnemyProtect(const int dmf = 20);
+    void Attack() const;
+protected:
+    int m_Dmg;
+};
+
+class myBoss : public myEnemyProtect {
+public:
+    myBoss();
+    void SpecialAttack() const;
+protected:
+    int m_SpecialDmg;
+};
+
+class myFinalBoss : public myBoss {
+public:
+    myFinalBoss();
+    void UltraAttack() const;
+};
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+class myCreature { // абстрактный класс
+public:
+    myCreature(int health = 100);
+    virtual ~myCreature();
+    virtual void Greet() const = 0; // чистая виртуальная функция-член
+    virtual void ShowHealth() const;
+protected:
+    int m_Health;
+};
+
+class myOrc : public myCreature {
+public:
+    myOrc(int orcHealth = 150);
+    virtual ~myOrc();
+    void Greet() const override; // определение виртуальной функции для конкретного класса
+};
+
+class myOrcBoss : public myOrc {
+public:
+    myOrcBoss(int bossHealth = 185);
+    virtual ~myOrcBoss();
+    void Greet() const override; // определение виртуальной функции для конкретного класса
+};
 /* game Balc Jack  ___________________________________________________________*/
-/*
-class BJ_Card {
+
+class myCard {
 public:
     enum rank {R_ACE = 1, R_TWO, R_THREE, R_FOUR, R_FIVE, R_SIX, R_SEVEN,
                R_EIGHT, R_NINE, R_TEN, R_JACK, R_QUEEN, R_KING};
     enum suit {S_CLUBS, S_DIAMOND, S_HEARTS, S_SPADERS};
 // прегружаем оператор <<, что бы можно было отображать объект в стандартный поток вывода
-    friend std::ostream & operator << (std::ostream & out, const BJ_Card & rCard);
-    BJ_Card(rank r = R_ACE, suit s = S_SPADERS, bool iFace = true);
+    friend std::ostream & operator << (std::ostream & out, const myCard & rCard);
+    myCard(rank r = R_ACE, suit s = S_SPADERS, bool iFace = true);
     int GetValue() const; // возвращает значение карты от 1 до 11
     void Flip(); // переворачивает карту лицом вниз или вверх
 private:
@@ -66,25 +114,25 @@ private:
     bool m_IsFaceUp;
 };
 
-class BJ_Hand {
+class myHand {
 public:
-    BJ_Hand(int reserv = 7);
-    ~BJ_Hand();
-    void AddCard(BJ_Card * pCard); // добавляем карту в руку // const?
+    myHand(int reserv = 7);
+    ~myHand();
+    void AddCard(myCard * pCard); // добавляем карту в руку // const?
     void Clear(); // очищаем руку от карт
     // получаем сумму очков в руке, присваиваем Тузу 1 или 11
     // в зависимости от ситуации
     int GetTotal() const;
 protected:
-    std::vector <BJ_Card * > m_Cards;
+    std::vector <myCard * > m_Cards;
 };
 
-class BJ_GenericPlayer : public BJ_Hand {
+class myGenericPlayer : public myHand {
 // печать ввод-вывод
-friend std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rPlayer);
+friend std::ostream & operator << (std::ostream & out, const myGenericPlayer & rPlayer);
 public:
-    BJ_GenericPlayer(const std::string & rName = "");
-    virtual ~BJ_GenericPlayer();
+    myGenericPlayer(const std::string & rName = "");
+    virtual ~myGenericPlayer();
     virtual bool IsHitt() const = 0; // показывает, хочет ли игрок продолжать брать карты
     bool IsBusted() const; // Возвращает значение, если у игрока "перебор", больше 21
     void Bust() const; // объявляет, что у игрока перебор
@@ -92,48 +140,49 @@ protected:
     std::string m_NamePlayer;
 };
 
-class BJ_Player : public BJ_GenericPlayer {
+class myPlayerBJ : public myGenericPlayer {
 public:
-    BJ_Player(const std::string & rName = "");
-    virtual ~BJ_Player();
+    myPlayerBJ(const std::string & rName = "");
+    virtual ~myPlayerBJ();
     virtual bool IsHitt() const; // показывае, хочет ли игрок продолжать брать карты
     void Win() const; // объявляет, что игрок победил
     void Lose() const; // объявляет, что игрок проиграл
     void Push() const; // объявляет ничью
 };
 
-class BJ_House : public BJ_GenericPlayer {
+class myHouse : public myGenericPlayer {
 public:
-    BJ_House(const std::string & rNameHouse = "House");
-    virtual ~BJ_House();
+    myHouse(const std::string & rNameHouse = "House");
+    virtual ~myHouse();
     virtual bool IsHitt() const; // показывает, хочет ли игрок продолжать брать карты
     void FlipFirstCard(); // переворачивает первую карту
 };
 
-class BJ_Deck : public BJ_Hand {
+class myDeck : public myHand {
 public:
-    BJ_Deck();
-    virtual ~BJ_Deck();
+    myDeck();
+    virtual ~myDeck();
+    int GetRemainingCard() const; // получить остаоок карт
     void Populate(); // создание колоды карт из 52 карт
     void Shuffle(); // Тусование колоды карт
-    void Deal(BJ_Hand & rHand); // раздаёт одну карту в руку
-    void AdditionalMore(BJ_GenericPlayer & rGPlayer); // даёт дополнительные карты игроку
+    void Deal(myHand & rHand); // раздаёт одну карту в руку
+    void AdditionalMore(myGenericPlayer & rGPlayer); // даёт дополнительные карты игроку
 };
 
-class BJ_Game {
-    BJ_Deck m_Deck;
-    BJ_House m_House;
-    std::vector <BJ_Player> m_Players;
+class myGameBJ {
+    myDeck m_Deck;
+    myHouse m_House;
+    std::vector <myPlayerBJ> m_Players;
+    void NewDeck(); // создать новую колоду
 public:
-    BJ_Game(const std::vector <std::string> & rNameVec);
-    ~BJ_Game();
+    myGameBJ(const std::vector <std::string> & rNameVec);
+    ~myGameBJ();
     void StartPlay(); // запустить игру в BlackJack
 };
 
 // перегруженные операторы вывода BJ
-std::ostream & operator << (std::ostream & out, const BJ_Card & rCard);
-std::ostream & operator << (std::ostream & out, const BJ_GenericPlayer & rGPlr);
+std::ostream & operator << (std::ostream & out, const myCard & rCard);
+std::ostream & operator << (std::ostream & out, const myGenericPlayer & rGPlr);
 // game Black JAck __________________________________________________________ */
-
 
 #endif //MY_CLASS_GAME_HPP
